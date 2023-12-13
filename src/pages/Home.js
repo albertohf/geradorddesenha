@@ -1,15 +1,29 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Modal } from 'react-native';
 import Slider from '@react-native-community/slider'
 import { useState } from 'react';
+import ModalContent from '../components/ModalContent';
 
 
 export default function Home() {
-    const [value, setValue] = useState(6);
+    const [size, setSize] = useState(6);
+    const [password, setPassword] = useState('');
+    const [modalVisible, setModalVisible] = useState(false);
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*()_+-=[]{}|;:,.<>?';
+
+    function handleGeneratePass() {
+        let pass = '';
+        for (let i = 0; i < size; i++) {
+            pass += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        setPassword(pass);
+        setModalVisible(true);
+    }
+
 
   return (
     <View style={styles.container}>
       <Image style={styles.logo} source={require('../assets/logo.png')} />
-      <Text style={styles.title}>{value} Caracteres</Text>
+      <Text style={styles.title}>{size} caracteres</Text>
 
       <View style={styles.area}>
         <Slider
@@ -19,12 +33,25 @@ export default function Home() {
           minimumTrackTintColor="#00ff00"
           maximumTrackTintColor="#000000"
           thumbTintColor='#00ff'
+          value={size}
+          onValueChange={(value) => setSize(value.toFixed(0))}
         />
       </View>
 
-      <TouchableOpacity style={styles.button} opacity={.7}>
+      <TouchableOpacity style={styles.button} opacity={.7} onPress={handleGeneratePass}>
         <Text style={styles.buttonText}>Gerar Senha</Text>
       </TouchableOpacity>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setModalVisible(!modalVisible);
+        }}>
+            <ModalContent pass={password} handleClose={() => setModalVisible(false)}/>
+      </Modal>
     </View>
   );
 }
